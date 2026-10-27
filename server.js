@@ -2162,10 +2162,14 @@ app.post('/api/stock-opnames', (req, res) => {
 
 // Jalankan Web Server
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`=======================================================`);
-  console.log(`  APLIKASI USAHA KESET (SAK EMKM) AKTIF & BERJALAN!`);
-  console.log(`  Buka browser Anda di: http://localhost:${PORT}`);
-  console.log(`=======================================================`);
-});
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`=======================================================`);
+    console.log(`  APLIKASI USAHA KESET (SAK EMKM) AKTIF & BERJALAN!`);
+    console.log(`  Buka browser Anda di: http://localhost:${PORT}`);
+    console.log(`=======================================================`);
+  });
+}
+
+module.exports = app;
 

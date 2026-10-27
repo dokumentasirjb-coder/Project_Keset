@@ -3,7 +3,17 @@ const { DatabaseSync } = require('node:sqlite');
 const path = require('path');
 const fs = require('fs');
 
-const DB_PATH = path.join(__dirname, 'keset.db');
+let DB_PATH = path.join(__dirname, 'keset.db');
+
+// Dukungan Serverless Vercel (karena root folder bersifat read-only)
+if (process.env.VERCEL) {
+  const tmpPath = path.join('/tmp', 'keset.db');
+  if (!fs.existsSync(tmpPath) && fs.existsSync(DB_PATH)) {
+    fs.copyFileSync(DB_PATH, tmpPath);
+  }
+  DB_PATH = tmpPath;
+}
+
 const db = new DatabaseSync(DB_PATH);
 
 // Aktifkan foreign key enforcement
