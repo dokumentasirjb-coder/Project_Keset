@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistem Operasional & Akuntansi Usaha Keset (SAK EMKM)</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .tab-active { @apply bg-indigo-600 text-white shadow-md; }
+    .badge-posted { @apply bg-emerald-100 text-emerald-800 border border-emerald-300; }
+    .badge-draft { @apply bg-amber-100 text-amber-800 border border-amber-300; }
+    .badge-open { @apply bg-blue-100 text-blue-800 border border-blue-300; }
+    .badge-closed { @apply bg-slate-100 text-slate-700 border border-slate-300; }
+  </style>
+</head>
+<body class="bg-white text-slate-800 min-h-screen flex flex-col">
+
+  <!-- Header & Navbar -->
+  <header class="bg-white text-slate-800 border-b border-slate-200 shadow-sm sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <div class="flex items-center space-x-3">
+          <div class="bg-indigo-600 p-2 rounded-xl text-white shadow-sm">
+            <i class="fa-solid fa-rug text-xl"></i>
+          </div>
+          <div>
+            <h1 class="font-extrabold text-lg leading-tight tracking-wide text-slate-900">ERP USAHA KESET</h1>
+            <p class="text-xs text-indigo-600 font-semibold">Sistem Manufaktur & Akuntansi SAK EMKM</p>
+          </div>
+        </div>
+
+        <!-- Quick Status -->
+        <div class="flex items-center space-x-4 text-xs">
+          <span class="inline-flex items-center px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium">
+            <span class="w-2 h-2 mr-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
+            Server Aktif (SQLite)
+          </span>
+          <span class="text-slate-500 hidden sm:inline font-medium">Metode: Moving Average</span>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="flex space-x-1 overflow-x-auto pb-2 scrollbar-none text-sm font-medium border-t border-slate-100 pt-1.5">
+        <button onclick="switchTab('dashboard')" id="nav-dashboard" class="px-3.5 py-1.5 rounded-lg flex items-center space-x-2 tab-btn text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition">
+          <i class="fa-solid fa-chart-pie"></i><span>Dashboard</span>
+        </button>
+        <button onclick="switchTab('production')" id="nav-production" class="px-3.5 py-1.5 rounded-lg flex items-center space-x-2 tab-btn text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition">
+          <i class="fa-solid fa-industry"></i><span>Produksi Borongan (SPK)</span>
+        </button>
+        <button onclick="switchTab('sales')" id="nav-sales" class="px-3.5 py-1.5 rounded-lg flex items-center space-x-2 tab-btn text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition">
+          <i class="fa-solid fa-cash-register"></i><span>Penjualan (POS)</span>
+        </button>
+        <button onclick="switchTab('purchases')" id="nav-purchases" class="px-3.5 py-1.5 rounded-lg flex items-center space-x-2 tab-btn text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition">
+          <i class="fa-solid fa-truck-ramp-box"></i><span>Pembelian Bahan</span>
+        </button>
+        <button onclick="switchTab('workers')" id="nav-workers" class="px-3.5 py-1.5 rounded-lg flex items-center space-x-2 tab-btn text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition">
+          <i class="fa-solid fa-users"></i><span>Pekerja & Upah</span>
+        </button>
+        <button onclick="switchTab('inventory')" id="nav-inventory" class="px-3.5 py-1.5 rounded-lg flex items-center space-x-2 tab-btn text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition">
+          <i class="fa-solid fa-boxes-stacked"></i><span>Stok & Bahan</span>
+        </button>
+        <button onclick="switchTab('finance')" id="nav-finance" class="px-3.5 py-1.5 rounded-lg flex items-center space-x-2 tab-btn text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition">
+          <i class="fa-solid fa-wallet"></i><span>Kas & Biaya</span>
+        </button>
+        <button onclick="switchTab('reports')" id="nav-reports" class="px-3.5 py-1.5 rounded-lg flex items-center space-x-2 tab-btn text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition">
+          <i class="fa-solid fa-file-invoice-dollar"></i><span>Laporan Keuangan</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
+
+    <!-- ======================================================== -->
+    <!-- TAB 1: DASHBOARD -->
+    <!-- ======================================================== -->
+    <section id="tab-dashboard" class="tab-content space-y-6">
+      <!-- Welcome & Alert Banner -->
+      <div class="bg-gradient-to-r from-indigo-600 via-indigo-700 to-blue-600 text-white rounded-2xl p-6 shadow-md flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <span class="text-xs uppercase tracking-wider font-semibold bg-indigo-500/40 text-indigo-200 px-2.5 py-0.5 rounded-full">Sistem Aktif</span>
+          <h2 class="text-2xl font-bold mt-1">Selamat Datang di Portal Usaha Keset</h2>
+          <p class="text-indigo-200 text-sm mt-1 max-w-xl">Semua alur produksi borongan, inventaris multi-lokasi, dan pembukuan jurnal otomatis SAK EMKM terhubung dalam satu sistem terintegrasi.</p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button onclick="openModal('modal-new-ticket')" class="px-4 py-2 bg-indigo-500 hover:bg-indigo-400 text-white rounded-xl text-sm font-semibold shadow transition flex items-center gap-2">
+            <i class="fa-solid fa-plus-circle"></i> Buka SPK Baru
+          </button>
+          <button onclick="openModal('modal-new-sale')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-sm font-semibold shadow transition flex items-center gap-2">
+            <i class="fa-solid fa-cart-shopping"></i> Penjualan Baru
+          </button>
+        </div>
+      </div>
+
+      <!-- KPI Summary Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Kas & Bank -->
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Kas & Bank</span>
+            <div class="p-2.5 bg-blue-50 text-blue-600 rounded-xl"><i class="fa-solid fa-money-bill-wave text-lg"></i></div>
+          </div>
+          <h3 id="kpi-cash" class="text-2xl font-bold text-slate-800 mt-2">Rp 0</h3>
+          <p class="text-xs text-slate-500 mt-1">Saldo likuid kas & rekening bank</p>
+        </div>
+
+        <!-- Total Persediaan -->
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Nilai Persediaan</span>
+            <div class="p-2.5 bg-amber-50 text-amber-600 rounded-xl"><i class="fa-solid fa-warehouse text-lg"></i></div>
+          </div>
+          <h3 id="kpi-inventory" class="text-2xl font-bold text-slate-800 mt-2">Rp 0</h3>
+          <div class="flex items-center gap-2 text-xs text-slate-500 mt-1">
+            <span title="Gudang Bahan Baku">Raw: <b id="kpi-raw">Rp 0</b></span> |
+            <span title="Bahan di Pekerja">WIP: <b id="kpi-wip">Rp 0</b></span> |
+            <span title="Barang Jadi">FG: <b id="kpi-fg">Rp 0</b></span>
+          </div>
+        </div>
+
+        <!-- Piutang Usaha -->
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Piutang Pelanggan</span>
+            <div class="p-2.5 bg-purple-50 text-purple-600 rounded-xl"><i class="fa-solid fa-file-invoice text-lg"></i></div>
+          </div>
+          <h3 id="kpi-ar" class="text-2xl font-bold text-slate-800 mt-2">Rp 0</h3>
+          <p class="text-xs text-slate-500 mt-1">Tagihan aktif yang belum dibayar mitra</p>
+        </div>
+
+        <!-- Utang Usaha & Upah -->
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Utang (Pemasok + Upah)</span>
+            <div class="p-2.5 bg-rose-50 text-rose-600 rounded-xl"><i class="fa-solid fa-hand-holding-dollar text-lg"></i></div>
+          </div>
+          <h3 id="kpi-ap" class="text-2xl font-bold text-slate-800 mt-2">Rp 0</h3>
+          <div class="text-xs text-slate-500 mt-1">
+            <span>Utang Bahan: <b id="kpi-ap-vendor">Rp 0</b></span> |
+            <span>Upah Borongan: <b id="kpi-ap-wage">Rp 0</b></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Overdue Ticket Alert (jika ada) -->
+      <div id="overdue-alert" class="hidden bg-amber-50 border-l-4 border-amber-500 p-4 rounded-xl flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <i class="fa-solid fa-triangle-exclamation text-amber-600 text-xl"></i>
+          <div>
+            <h4 class="font-bold text-amber-800 text-sm">Perhatian: Ada Tiket Borongan Lewat Batas Waktu</h4>
+            <p id="overdue-count-text" class="text-xs text-amber-700">Terdapat SPK yang belum disetor melewati batas tanggal.</p>
+          </div>
+        </div>
+        <button onclick="switchTab('production')" class="px-3 py-1 bg-amber-600 text-white rounded-lg text-xs font-semibold hover:bg-amber-700">Periksa</button>
+      </div>
+
+      <!-- Recent Tables Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Tiket Borongan Aktif -->
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-bold text-base text-slate-800 flex items-center gap-2">
+              <i class="fa-solid fa-clock-rotate-left text-indigo-600"></i> SPK Borongan Terbaru
+            </h3>
+            <button onclick="switchTab('production')" class="text-xs text-indigo-600 font-semibold hover:underline">Lihat Semua</button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs text-slate-600">
+              <thead class="bg-slate-50 text-slate-700 uppercase font-semibold border-b">
+                <tr>
+                  <th class="p-2.5">No SPK</th>
+                  <th class="p-2.5">Pekerja</th>
+                  <th class="p-2.5">Produk Target</th>
+                  <th class="p-2.5 text-center">Status</th>
+                </tr>
+              </thead>
+              <tbody id="dash-recent-tickets">
+                <tr><td colspan="4" class="p-4 text-center text-slate-400">Memuat data...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Penjualan Terbaru -->
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-bold text-base text-slate-800 flex items-center gap-2">
+              <i class="fa-solid fa-receipt text-emerald-600"></i> Penjualan Terbaru
+            </h3>
+            <button onclick="switchTab('sales')" class="text-xs text-indigo-600 font-semibold hover:underline">Lihat Semua</button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs text-slate-600">
+              <thead class="bg-slate-50 text-slate-700 uppercase font-semibold border-b">
+                <tr>
+                  <th class="p-2.5">Faktur</th>
+                  <th class="p-2.5">Pelanggan</th>
+                  <th class="p-2.5 text-right">Total</th>
+                  <th class="p-2.5 text-center">Status Bayar</th>
+                </tr>
+              </thead>
+              <tbody id="dash-recent-sales">
+                <tr><td colspan="4" class="p-4 text-center text-slate-400">Memuat data...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- TAB 2: PRODUKSI BORONGAN (SPK) -->
+    <!-- ======================================================== -->
+    <section id="tab-production" class="tab-content hidden space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+        <div>
+          <h2 class="text-xl font-bold text-slate-800">Manajemen Produksi Borongan</h2>
+          <p class="text-xs text-slate-500 mt-1">Alur SPK: Serah Bahan (D1) ➔ Setor Hasil & QC (D2) ➔ Retur Sisa (D3) ➔ Tutup Tiket & Analisis Susut (D4/D5).</p>
+        </div>
+        <button onclick="openModal('modal-new-ticket')" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold shadow transition flex items-center gap-2">
+          <i class="fa-solid fa-file-circle-plus"></i> Buat SPK Baru
+        </button>
+      </div>
+
+      <!-- Work Tickets Table -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="p-4 border-b border-slate-100 flex items-center justify-between">
+          <h3 class="font-bold text-sm text-slate-800">Daftar Tiket Kerja (Surat Perintah Kerja)</h3>
+          <button onclick="loadWorkTickets()" class="text-xs text-indigo-600 hover:underline flex items-center gap-1">
+            <i class="fa-solid fa-rotate-right"></i> Segarkan
+          </button>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs text-slate-600">
+            <thead class="bg-slate-50 text-slate-700 uppercase font-semibold border-b">
+              <tr>
+                <th class="p-3">No SPK</th>
+                <th class="p-3">Pekerja</th>
+                <th class="p-3">Target Produk</th>
+                <th class="p-3 text-right">Target Qty</th>
+                <th class="p-3 text-right">Hasil QC (Pass / Reject)</th>
+                <th class="p-3">Batas Tanggal</th>
+                <th class="p-3 text-center">Status</th>
+                <th class="p-3 text-center">Aksi Operasional</th>
+              </tr>
+            </thead>
+            <tbody id="tickets-table-body" class="divide-y divide-slate-100">
+              <tr><td colspan="8" class="p-4 text-center text-slate-400">Memuat SPK...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- TAB 3: PENJUALAN (POS) -->
+    <!-- ======================================================== -->
+    <section id="tab-sales" class="tab-content hidden space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+        <div>
+          <h2 class="text-xl font-bold text-slate-800">Penjualan Keset & Bahan Baku</h2>
+          <p class="text-xs text-slate-500 mt-1">Mendukung harga bertingkat, penjualan tunai/kredit, dan netting piutang mitra.</p>
+        </div>
+        <div class="flex gap-2">
+          <button onclick="openModal('modal-netting')" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-semibold shadow transition flex items-center gap-2">
+            <i class="fa-solid fa-arrows-split-up-and-left"></i> Netting Mitra (C1)
+          </button>
+          <button onclick="openModal('modal-new-sale')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-semibold shadow transition flex items-center gap-2">
+            <i class="fa-solid fa-cart-plus"></i> Transaksi Penjualan Baru
+          </button>
+        </div>
+      </div>
+
+      <!-- Sales Table -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="p-4 border-b border-slate-100 flex items-center justify-between">
+          <h3 class="font-bold text-sm text-slate-800">Riwayat Faktur Penjualan</h3>
+          <button onclick="loadSales()" class="text-xs text-indigo-600 hover:underline flex items-center gap-1">
+            <i class="fa-solid fa-rotate-right"></i> Segarkan
+          </button>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs text-slate-600">
+            <thead class="bg-slate-50 text-slate-700 uppercase font-semibold border-b">
+              <tr>
+                <th class="p-3">No Faktur</th>
+                <th class="p-3">Tanggal</th>
+                <th class="p-3">Pelanggan</th>
+                <th class="p-3">Detail Barang</th>
+                <th class="p-3 text-right">Total Faktur</th>
+                <th class="p-3 text-right">Dibayar</th>
+                <th class="p-3 text-center">Status Bayar</th>
+                <th class="p-3 text-center">Jurnal</th>
+                <th class="p-3 text-center">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="sales-table-body" class="divide-y divide-slate-100">
+              <tr><td colspan="9" class="p-4 text-center text-slate-400">Memuat faktur...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- TAB 4: PEMBELIAN BAHAN BAKU -->
+    <!-- ======================================================== -->
+    <section id="tab-purchases" class="tab-content hidden space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+        <div>
+          <h2 class="text-xl font-bold text-slate-800">Pengadaan Bahan Baku</h2>
+          <p class="text-xs text-slate-500 mt-1">Pembelian menambah stok di gudang RAW_WH dan memperbarui biaya rata-rata bergerak (*moving average*).</p>
+        </div>
+        <button onclick="openModal('modal-new-purchase')" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold shadow transition flex items-center gap-2">
+          <i class="fa-solid fa-cart-flatbed"></i> Beli Bahan Baku Baru
+        </button>
+      </div>
+
+      <!-- Purchases Table -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="p-4 border-b border-slate-100 flex items-center justify-between">
+          <h3 class="font-bold text-sm text-slate-800">Daftar Pembelian (PO)</h3>
+          <button onclick="loadPurchases()" class="text-xs text-indigo-600 hover:underline flex items-center gap-1">
+            <i class="fa-solid fa-rotate-right"></i> Segarkan
+          </button>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs text-slate-600">
+            <thead class="bg-slate-50 text-slate-700 uppercase font-semibold border-b">
+              <tr>
+                <th class="p-3">No PO</th>
+                <th class="p-3">Tanggal</th>
+                <th class="p-3">Pemasok</th>
+                <th class="p-3">Bahan Baku Diterima</th>
+                <th class="p-3 text-right">Total Biaya</th>
+                <th class="p-3 text-right">Sudah Dibayar</th>
+                <th class="p-3 text-center">Status</th>
+                <th class="p-3 text-center">Jurnal</th>
+                <th class="p-3 text-center">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="purchases-table-body" class="divide-y divide-slate-100">
+              <tr><td colspan="9" class="p-4 text-center text-slate-400">Memuat pembelian...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- TAB 5: PEKERJA & UPAH BORONGAN -->
+    <!-- ======================================================== -->
+    <section id="tab-workers" class="tab-content hidden space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+        <div>
+          <h2 class="text-xl font-bold text-slate-800">Pekerja Borongan & Penggajian</h2>
+          <p class="text-xs text-slate-500 mt-1">Kelola pekerja, monitoring bahan WIP di tangan pekerja, pencairan kasbon, dan slip upah borongan.</p>
+        </div>
+        <div class="flex gap-2">
+          <button onclick="openModal('modal-new-advance')" class="px-3.5 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-semibold shadow transition flex items-center gap-2">
+            <i class="fa-solid fa-hand-holding-dollar"></i> Beri Kasbon (E1)
+          </button>
+          <button onclick="openModal('modal-new-worker')" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold shadow transition flex items-center gap-2">
+            <i class="fa-solid fa-user-plus"></i> Tambah Pekerja
+          </button>
+        </div>
+      </div>
+
+      <!-- Workers List Cards & Wage Slips -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Daftar Pekerja -->
+        <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+          <div class="p-4 border-b border-slate-100">
+            <h3 class="font-bold text-sm text-slate-800">Daftar Pekerja & Saldo Berjalan</h3>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs text-slate-600">
+              <thead class="bg-slate-50 text-slate-700 uppercase font-semibold border-b">
+                <tr>
+                  <th class="p-3">Nama Pekerja</th>
+                  <th class="p-3">Kontak & Alamat</th>
+                  <th class="p-3 text-right">Bahan Dibawa (WIP)</th>
+                  <th class="p-3 text-right">Utang Upah Belum Dibayar</th>
+                  <th class="p-3 text-right">Sisa Kasbon</th>
+                  <th class="p-3 text-center">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="workers-table-body" class="divide-y divide-slate-100">
+                <tr><td colspan="6" class="p-4 text-center text-slate-400">Memuat pekerja...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Riwayat Slip Upah Terbaru -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+          <div class="p-4 border-b border-slate-100">
+            <h3 class="font-bold text-sm text-slate-800">Slip Gaji Borongan Terakhir</h3>
+          </div>
+          <div class="p-4 space-y-3" id="wage-slips-list">
+            <p class="text-xs text-slate-400 text-center">Memuat slip gaji...</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- TAB 6: INVENTARIS, RESEP (BOM), & TARIF -->
+    <!-- ======================================================== -->
+    <section id="tab-inventory" class="tab-content hidden space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+        <div>
+          <h2 class="text-xl font-bold text-slate-800">Master Data & Saldo Stok Barang</h2>
+          <p class="text-xs text-slate-500 mt-1">Kelola Bahan Baku, Keset (Barang Jadi), Resep Kebutuhan Bahan (BOM), Tarif Upah Borongan, dan Penyesuaian Opname.</p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button onclick="openModal('modal-stock-opname')" class="px-3.5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-semibold shadow transition flex items-center gap-2">
+            <i class="fa-solid fa-scale-balanced"></i> Stok Opname (F4/F5)
+          </button>
+          <button onclick="openModal('modal-new-item')" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold shadow transition flex items-center gap-2">
+            <i class="fa-solid fa-box"></i> Tambah Barang
+          </button>
+          <button onclick="openModal('modal-new-partner')" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-semibold shadow transition flex items-center gap-2">
+            <i class="fa-solid fa-handshake"></i> Tambah Mitra
+          </button>
+        </div>
+      </div>
+
+      <!-- Items Stock Table -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="p-4 border-b border-slate-100 flex items-center justify-between">
+          <h3 class="font-bold text-sm text-slate-800">Daftar Barang & Saldo Multi-Lokasi</h3>
+          <button onclick="loadItems()" class="text-xs text-indigo-600 hover:underline flex items-center gap-1">
+            <i class="fa-solid fa-rotate-right"></i> Segarkan
+          </button>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs text-slate-600">
+            <thead class="bg-slate-50 text-slate-700 uppercase font-semibold border-b">
+              <tr>
+                <th class="p-3">SKU</th>
+                <th class="p-3">Nama Produk / Bahan</th>
+                <th class="p-3">Tipe</th>
+                <th class="p-3 text-right">Stok Gudang (RAW/FG)</th>
+                <th class="p-3 text-right">Stok WIP (Pekerja)</th>
+                <th class="p-3 text-right">Biaya Rata-Rata (Avg Cost)</th>
+                <th class="p-3">Harga Jual (Eceran / Grosir)</th>
+              </tr>
+            </thead>
+            <tbody id="items-table-body" class="divide-y divide-slate-100">
+              <tr><td colspan="7" class="p-4 text-center text-slate-400">Memuat data barang...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- BOM & Mitra Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Resep BOM -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+          <div class="p-4 border-b border-slate-100 flex items-center justify-between">
+            <h3 class="font-bold text-sm text-slate-800">Resep Standar (BOM) Kebutuhan Bahan</h3>
+            <button onclick="openModal('modal-new-bom')" class="text-xs text-indigo-600 hover:underline font-semibold">+ Buat Resep Baru</button>
+          </div>
+          <div id="boms-list" class="p-4 space-y-4">
+            <p class="text-xs text-slate-400 text-center">Memuat resep...</p>
+          </div>
+        </div>
+
+        <!-- Mitra Usaha -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+          <div class="p-4 border-b border-slate-100 flex items-center justify-between">
+            <h3 class="font-bold text-sm text-slate-800">Mitra Usaha (Pemasok & Pelanggan)</h3>
+            <button onclick="loadPartners()" class="text-xs text-indigo-600 hover:underline flex items-center gap-1">
+              <i class="fa-solid fa-rotate-right"></i> Segarkan
+            </button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs text-slate-600">
+              <thead class="bg-slate-50 text-slate-700 uppercase font-semibold border-b">
+                <tr>
+                  <th class="p-2.5">Mitra</th>
+                  <th class="p-2.5">Peran</th>
+                  <th class="p-2.5 text-right">Piutang Kita</th>
+                  <th class="p-2.5 text-right">Utang Kita</th>
+                  <th class="p-2.5 text-right font-bold">Saldo Bersih</th>
+                </tr>
+              </thead>
+              <tbody id="partners-table-body" class="divide-y divide-slate-100">
+                <tr><td colspan="5" class="p-4 text-center text-slate-400">Memuat mitra...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- TAB 7: KAS & BIAYA OPERASIONAL -->
+    <!-- ======================================================== -->
+    <section id="tab-finance" class="tab-content hidden space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+        <div>
+          <h2 class="text-xl font-bold text-slate-800">Kas & Beban Operasional</h2>
+          <p class="text-xs text-slate-500 mt-1">Catat biaya operasional (transportasi, listrik, gudang), setor modal, prive, dan perpindahan kas.</p>
+        </div>
+        <button onclick="openModal('modal-new-cash-trx')" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold shadow transition flex items-center gap-2">
+          <i class="fa-solid fa-money-bill-transfer"></i> Catat Transaksi Kas (F1/F2/F3)
+        </button>
+      </div>
+
+      <!-- Cash Accounts & Transactions -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Rekening Kas & Bank -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 space-y-4">
+          <h3 class="font-bold text-sm text-slate-800 border-b pb-2">Saldo Rekening Kas & Bank</h3>
+          <div id="cash-accounts-list" class="space-y-3">
+            <p class="text-xs text-slate-400 text-center">Memuat akun...</p>
+          </div>
+        </div>
+
+        <!-- Mutasi Kas -->
+        <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+          <div class="p-4 border-b border-slate-100 flex items-center justify-between">
+            <h3 class="font-bold text-sm text-slate-800">Riwayat Mutasi Kas & Operasional</h3>
+            <button onclick="loadCashTransactions()" class="text-xs text-indigo-600 hover:underline flex items-center gap-1">
+              <i class="fa-solid fa-rotate-right"></i> Segarkan
+            </button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs text-slate-600">
+              <thead class="bg-slate-50 text-slate-700 uppercase font-semibold border-b">
+                <tr>
+                  <th class="p-3">No Transaksi</th>
+                  <th class="p-3">Tanggal</th>
+                  <th class="p-3">Rekening</th>
+                  <th class="p-3">Akun Lawan (Beban/Ekuitas)</th>
+                  <th class="p-3 text-right">Jumlah</th>
+                  <th class="p-3">Keterangan</th>
+                  <th class="p-3 text-center">Jurnal</th>
+                </tr>
+              </thead>
+              <tbody id="cash-trx-table-body" class="divide-y divide-slate-100">
+                <tr><td colspan="7" class="p-4 text-center text-slate-400">Memuat transaksi...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- TAB 8: LAPORAN KEUANGAN SAK EMKM -->
+    <!-- ======================================================== -->
+    <section id="tab-reports" class="tab-content hidden space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+        <div>
+          <h2 class="text-xl font-bold text-slate-800">Laporan Keuangan Standar SAK EMKM</h2>
+          <p class="text-xs text-slate-500 mt-1">Laporan Laba Rugi, Posisi Keuangan (Neraca), Neraca Saldo, dan Buku Jurnal Umum Lengkap.</p>
+        </div>
+        <div class="flex flex-wrap gap-1.5">
+          <button onclick="loadIncomeStatement()" class="px-3 py-1.5 bg-indigo-50 text-indigo-700 rounded-lg text-xs font-semibold hover:bg-indigo-100">Laba Rugi</button>
+          <button onclick="loadBalanceSheet()" class="px-3 py-1.5 bg-indigo-50 text-indigo-700 rounded-lg text-xs font-semibold hover:bg-indigo-100">Neraca</button>
+          <button onclick="loadCashFlow()" class="px-3 py-1.5 bg-indigo-50 text-indigo-700 rounded-lg text-xs font-semibold hover:bg-indigo-100">Arus Kas</button>
+          <button onclick="loadEquityStatement()" class="px-3 py-1.5 bg-indigo-50 text-indigo-700 rounded-lg text-xs font-semibold hover:bg-indigo-100">Perubahan Ekuitas</button>
+          <button onclick="loadTrialBalance()" class="px-3 py-1.5 bg-indigo-50 text-indigo-700 rounded-lg text-xs font-semibold hover:bg-indigo-100">Neraca Saldo</button>
+          <button onclick="loadJournals()" class="px-3 py-1.5 bg-indigo-50 text-indigo-700 rounded-lg text-xs font-semibold hover:bg-indigo-100">Jurnal Umum</button>
+          <button onclick="loadStockMovements()" class="px-3 py-1.5 bg-indigo-50 text-indigo-700 rounded-lg text-xs font-semibold hover:bg-indigo-100">Kartu Stok (Mutasi)</button>
+        </div>
+      </div>
+
+      <!-- Report Display Container -->
+      <div id="report-container" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-6">
+        <p class="text-center text-slate-400 text-sm">Pilih salah satu laporan di atas untuk melihat rincian.</p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ======================================================== -->
+  <!-- MODAL-MODAL INTERAKTIF (SPK, SALE, PURCHASE, RECEIPT, DLL) -->
+  <!-- ======================================================== -->
+
+  <!-- Modal 1: Buka Tiket SPK Baru -->
+  <div id="modal-new-ticket" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b pb-3">
+        <h3 class="font-bold text-slate-800 text-base">Buka SPK Tiket Kerja Baru</h3>
+        <button onclick="closeModal('modal-new-ticket')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <form id="form-new-ticket" onsubmit="submitNewTicket(event)" class="space-y-4 text-xs">
+        <div>
+          <label class="block font-semibold mb-1 text-slate-700">Pekerja Borongan</label>
+          <select id="ticket-worker-id" required class="w-full p-2.5 border rounded-xl bg-slate-50 focus:ring-2 focus:ring-indigo-500"></select>
+        </div>
+        <div>
+          <label class="block font-semibold mb-1 text-slate-700">Target Barang Jadi (Keset)</label>
+          <select id="ticket-item-id" required class="w-full p-2.5 border rounded-xl bg-slate-50 focus:ring-2 focus:ring-indigo-500"></select>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold mb-1 text-slate-700">Jumlah Target (Pcs)</label>
+            <input type="number" id="ticket-target-qty" min="1" step="1" required class="w-full p-2.5 border rounded-xl bg-slate-50 focus:ring-2 focus:ring-indigo-500" placeholder="Contoh: 50">
+          </div>
+          <div>
+            <label class="block font-semibold mb-1 text-slate-700">Batas Tanggal Setor</label>
+            <input type="date" id="ticket-due-date" required class="w-full p-2.5 border rounded-xl bg-slate-50 focus:ring-2 focus:ring-indigo-500">
+          </div>
+        </div>
+        <div>
+          <label class="block font-semibold mb-1 text-slate-700">Catatan Khusus</label>
+          <textarea id="ticket-note" rows="2" class="w-full p-2.5 border rounded-xl bg-slate-50" placeholder="Contoh: Kombinasi warna merah & biru"></textarea>
+        </div>
+        <div class="flex justify-end gap-2 pt-2 border-t">
+          <button type="button" onclick="closeModal('modal-new-ticket')" class="px-4 py-2 border rounded-xl text-slate-600 hover:bg-slate-100">Batal</button>
+          <button type="submit" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold">Buka Tiket</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 2: Serah Bahan ke Pekerja (D1) -->
+  <div id="modal-issue-material" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b pb-3">
+        <div>
+          <h3 class="font-bold text-slate-800 text-base">Serahkan Bahan ke Pekerja</h3>
+          <p id="issue-ticket-title" class="text-xs text-indigo-600 font-medium">SPK: ...</p>
+        </div>
+        <button onclick="closeModal('modal-issue-material')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <form id="form-issue-material" onsubmit="submitIssueMaterial(event)" class="space-y-4 text-xs">
+        <input type="hidden" id="issue-ticket-id">
+        <div>
+          <label class="block font-semibold mb-1 text-slate-700">Pilih Bahan Baku</label>
+          <select id="issue-material-id" required class="w-full p-2.5 border rounded-xl bg-slate-50 focus:ring-2 focus:ring-indigo-500"></select>
+        </div>
+        <div>
+          <label class="block font-semibold mb-1 text-slate-700">Jumlah Diserahkan</label>
+          <input type="number" id="issue-qty" min="0.01" step="0.01" required class="w-full p-2.5 border rounded-xl bg-slate-50 focus:ring-2 focus:ring-indigo-500" placeholder="Kuantitas bahan">
+        </div>
+        <div class="bg-blue-50 border border-blue-200 p-3 rounded-xl text-blue-800 text-xs">
+          <i class="fa-solid fa-circle-info mr-1"></i> Sistem akan memotong stok di <b>Gudang Bahan Baku (RAW_WH)</b> dan memindahkannya ke <b>Persediaan di Pekerja (WIP)</b> serta membuat Auto-Jurnal (D1).
+        </div>
+        <div class="flex justify-end gap-2 pt-2 border-t">
+          <button type="button" onclick="closeModal('modal-issue-material')" class="px-4 py-2 border rounded-xl text-slate-600 hover:bg-slate-100">Batal</button>
+          <button type="submit" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold">Serahkan Bahan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 3: Setor Hasil Jadi & QC (D2) -->
+  <div id="modal-receive-qc" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b pb-3">
+        <div>
+          <h3 class="font-bold text-slate-800 text-base">Setor Hasil Jadi & QC</h3>
+          <p id="receive-ticket-title" class="text-xs text-emerald-600 font-medium">SPK: ...</p>
+        </div>
+        <button onclick="closeModal('modal-receive-qc')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <form id="form-receive-qc" onsubmit="submitReceiveQc(event)" class="space-y-4 text-xs">
+        <input type="hidden" id="receive-ticket-id">
+        <div class="grid grid-cols-3 gap-2">
+          <div>
+            <label class="block font-semibold mb-1 text-emerald-700">Lolos QC (Pcs)</label>
+            <input type="number" id="receive-qty-pass" min="0" step="1" required class="w-full p-2.5 border border-emerald-300 rounded-xl bg-emerald-50 font-bold text-emerald-900" placeholder="0">
+          </div>
+          <div>
+            <label class="block font-semibold mb-1 text-amber-700">Rework (Pcs)</label>
+            <input type="number" id="receive-qty-rework" min="0" step="1" class="w-full p-2.5 border border-amber-300 rounded-xl bg-amber-50" placeholder="0">
+          </div>
+          <div>
+            <label class="block font-semibold mb-1 text-rose-700">Reject (Pcs)</label>
+            <input type="number" id="receive-qty-reject" min="0" step="1" class="w-full p-2.5 border border-rose-300 rounded-xl bg-rose-50" placeholder="0">
+          </div>
+        </div>
+        <div class="bg-emerald-50 border border-emerald-200 p-3 rounded-xl text-emerald-900 text-xs space-y-1">
+          <p><b>Auto-Jurnal (D2):</b></p>
+          <ul class="list-disc list-inside text-slate-700">
+            <li>Menambah stok barang jadi di Gudang FG_WH.</li>
+            <li>Mengkapitalisasi biaya bahan + upah borongan ke HPP Keset.</li>
+            <li>Mencatat utang upah borongan untuk pekerja.</li>
+          </ul>
+        </div>
+        <div class="flex justify-end gap-2 pt-2 border-t">
+          <button type="button" onclick="closeModal('modal-receive-qc')" class="px-4 py-2 border rounded-xl text-slate-600 hover:bg-slate-100">Batal</button>
+          <button type="submit" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-semibold">Simpan Setoran</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 4: Retur Sisa Bahan (D3) -->
+  <div id="modal-return-material" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b pb-3">
+        <div>
+          <h3 class="font-bold text-slate-800 text-base">Kembalikan Sisa Bahan</h3>
+          <p id="return-ticket-title" class="text-xs text-indigo-600 font-medium">SPK: ...</p>
+        </div>
+        <button onclick="closeModal('modal-return-material')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <form id="form-return-material" onsubmit="submitReturnMaterial(event)" class="space-y-4 text-xs">
+        <input type="hidden" id="return-ticket-id">
+        <div>
+          <label class="block font-semibold mb-1 text-slate-700">Pilih Bahan yang Dikembalikan</label>
+          <select id="return-material-id" required class="w-full p-2.5 border rounded-xl bg-slate-50"></select>
+        </div>
+        <div>
+          <label class="block font-semibold mb-1 text-slate-700">Jumlah Sisa Dikembalikan</label>
+          <input type="number" id="return-qty" min="0.01" step="0.01" required class="w-full p-2.5 border rounded-xl bg-slate-50" placeholder="Kuantitas retur">
+        </div>
+        <div class="flex justify-end gap-2 pt-2 border-t">
+          <button type="button" onclick="closeModal('modal-return-material')" class="px-4 py-2 border rounded-xl text-slate-600 hover:bg-slate-100">Batal</button>
+          <button type="submit" class="px-5 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-semibold">Kembalikan ke Gudang</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 5: Transaksi Penjualan Baru (POS) -->
+  <div id="modal-new-sale" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b pb-3">
+        <h3 class="font-bold text-slate-800 text-base">Buat Transaksi Penjualan (POS / Faktur)</h3>
+        <button onclick="closeModal('modal-new-sale')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <form id="form-new-sale" onsubmit="submitNewSale(event)" class="space-y-4 text-xs">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold mb-1 text-slate-700">Pelanggan</label>
+            <select id="sale-partner-id" class="w-full p-2.5 border rounded-xl bg-slate-50"></select>
+          </div>
+          <div>
+            <label class="block font-semibold mb-1 text-slate-700">Tanggal Faktur</label>
+            <input type="date" id="sale-date" required class="w-full p-2.5 border rounded-xl bg-slate-50">
+          </div>
+        </div>
+
+        <!-- Daftar Baris Barang -->
+        <div class="border rounded-xl p-3 bg-slate-50 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-slate-700">Barang yang Dijual</span>
+            <button type="button" onclick="addSaleLine()" class="px-2.5 py-1 bg-indigo-50 text-indigo-700 font-semibold rounded-lg hover:bg-indigo-100">+ Tambah Baris</button>
+          </div>
+          <div id="sale-lines-container" class="space-y-2">
+            <!-- Dynamic rows -->
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold mb-1 text-slate-700">Diskon Faktur (Rp)</label>
+            <input type="number" id="sale-discount" min="0" value="0" class="w-full p-2.5 border rounded-xl bg-slate-50">
+          </div>
+          <div>
+            <label class="block font-semibold mb-1 text-slate-700">Metode Pembayaran</label>
+            <select id="sale-is-cash" onchange="toggleSalePaymentFields()" class="w-full p-2.5 border rounded-xl bg-slate-50">
+              <option value="1">Tunai / Transfer Lunas</option>
+              <option value="0">Kredit (Piutang)</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="sale-cash-account-wrapper">
+          <label class="block font-semibold mb-1 text-slate-700">Rekening Kas Penerimaan</label>
+          <select id="sale-cash-account-id" class="w-full p-2.5 border rounded-xl bg-slate-50"></select>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-2 border-t">
+          <button type="button" onclick="closeModal('modal-new-sale')" class="px-4 py-2 border rounded-xl text-slate-600 hover:bg-slate-100">Batal</button>
+          <button type="submit" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-semibold">Simpan & Cetak Faktur</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 6: Pembelian Bahan Baku Baru (PO) -->
+  <div id="modal-new-purchase" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b pb-3">
+        <h3 class="font-bold text-slate-800 text-base">Catat Pembelian Bahan Baku Baru</h3>
+        <button onclick="closeModal('modal-new-purchase')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <form id="form-new-purchase" onsubmit="submitNewPurchase(event)" class="space-y-4 text-xs">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold mb-1 text-slate-700">Pemasok Bahan</label>
+            <select id="purchase-partner-id" required class="w-full p-2.5 border rounded-xl bg-slate-50"></select>
+          </div>
+          <div>
+            <label class="block font-semibold mb-1 text-slate-700">Tanggal Pembelian</label>
+            <input type="date" id="purchase-date" required class="w-full p-2.5 border rounded-xl bg-slate-50">
+          </div>
+        </div>
+
+        <div class="border rounded-xl p-3 bg-slate-50 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-slate-700">Daftar Bahan Baku</span>
+            <button type="button" onclick="addPurchaseLine()" class="px-2.5 py-1 bg-indigo-50 text-indigo-700 font-semibold rounded-lg hover:bg-indigo-100">+ Tambah Bahan</button>
+          </div>
+          <div id="purchase-lines-container" class="space-y-2"></div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold mb-1 text-slate-700">Status Pembayaran</label>
+            <select id="purchase-is-cash" onchange="togglePurchasePaymentFields()" class="w-full p-2.5 border rounded-xl bg-slate-50">
+              <option value="1">Bayar Tunai / Transfer</option>
+              <option value="0">Kredit (Utang Usaha)</option>
+            </select>
+          </div>
+          <div id="purchase-cash-account-wrapper">
+            <label class="block font-semibold mb-1 text-slate-700">Dibayar Melalui Rekening</label>
+            <select id="purchase-cash-account-id" class="w-full p-2.5 border rounded-xl bg-slate-50"></select>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-2 border-t">
+          <button type="button" onclick="closeModal('modal-new-purchase')" class="px-4 py-2 border rounded-xl text-slate-600 hover:bg-slate-100">Batal</button>
+          <button type="submit" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold">Simpan Pembelian</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 7: Buat Slip Upah Borongan (E2) -->
+  <div id="modal-new-wage-slip" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b pb-3">
+        <div>
+          <h3 class="font-bold text-slate-800 text-base">Buat Slip & Bayar Upah Borongan</h3>
+          <p id="wage-worker-title" class="text-xs text-indigo-600 font-medium">Pekerja: ...</p>
+        </div>
+        <button onclick="closeModal('modal-new-wage-slip')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <form id="form-new-wage-slip" onsubmit="submitNewWageSlip(event)" class="space-y-4 text-xs">
+        <input type="hidden" id="slip-worker-id">
+        <div>
+          <label class="block font-semibold mb-1 text-slate-700">Pilih Setoran Hasil Kerja yang Dibayar</label>
+          <div id="unpaid-receipts-container" class="border rounded-xl p-3 bg-slate-50 max-h-48 overflow-y-auto space-y-2">
+            <!-- Checkbox list of unpaid receipts -->
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold mb-1 text-slate-700">Potongan Kasbon (Rp)</label>
+            <input type="number" id="slip-advance-deduct" min="0" value="0" class="w-full p-2.5 border rounded-xl bg-slate-50">
+          </div>
+          <div>
+            <label class="block font-semibold mb-1 text-slate-700">Dibayar Lewat Rekening</label>
+            <select id="slip-cash-account-id" required class="w-full p-2.5 border rounded-xl bg-slate-50"></select>
+          </div>
+        </div>
+        <div class="flex justify-end gap-2 pt-2 border-t">
+          <button type="button" onclick="closeModal('modal-new-wage-slip')" class="px-4 py-2 border rounded-xl text-slate-600 hover:bg-slate-100">Batal</button>
+          <button type="submit" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold">Bayar Upah</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 8: Beri Kasbon Pekerja (E1) -->
+  <div id="modal-new-advance" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b pb-3">
+        <h3 class="font-bold text-slate-800 text-base">Pemberian Kasbon Pekerja (E1)</h3>
+        <button onclick="closeModal('modal-new-advance')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <form id="form-new-advance" onsubmit="submitNewAdvance(event)" class="space-y-4 text-xs">
+        <div>
+          <label class="block font-semibold mb-1 text-slate-700">Pekerja</label>
+          <select id="advance-worker-id" required class="w-full p-2.5 border rounded-xl bg-slate-50"></select>
+        </div>
+        <div>
+          <label class="block font-semibold mb-1 text-slate-700">Jumlah Kasbon (Rp)</label>
+          <input type="number" id="advance-amount" min="1000" step="1000" required class="w-full p-2.5 border rounded-xl bg-slate-50" placeholder="Contoh: 100000">
+        </div>
+        <div>
+          <label class="block font-semibold mb-1 text-slate-700">Rekening Kas Pengeluaran</label>
+          <select id="advance-cash-account-id" required class="w-full p-2.5 border rounded-xl bg-slate-50"></select>
+        </div>
+        <div class="flex justify-end gap-2 pt-2 border-t">
+          <button type="button" onclick="closeModal('modal-new-advance')" class="px-4 py-2 border rounded-xl text-slate-600 hover:bg-slate-100">Batal</button>
+          <button type="submit" class="px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-semibold">Cairkan Kasbon</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 9: Kas Operasional & Penyesuaian (F1/F2/F3) -->
+  <div id="modal-new-cash-trx" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b pb-3">
+        <h3 class="font-bold text-slate-800 text-base">Catat Transaksi Kas & Biaya</h3>
+        <button onclick="closeModal('modal-new-cash-trx')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <form id="form-new-cash-trx" onsubmit="submitNewCashTrx(event)" class="space-y-4 text-xs">
+        <div>
+          <label class="block font-semibold mb-1 text-slate-700">Jenis Transaksi</label>
+          <select id="cash-direction" class="w-full p-2.5 border rounded-xl bg-slate-50">
+            <option value="OUT">Pengeluaran Kas (Beban Operasional / Prive)</option>
+            <option value="IN">Penerimaan Kas (Setor Modal / Lainnya)</option>
+          </select>
+        </div>
+        <div>
+          <label class="block font-semibold mb-1 text-slate-700">Rekening Kas / Bank</label>
+          <select id="cash-trx-account-id" required class="w-full p-2.5 border rounded-xl bg-slate-50"></select>
+        </div>
+        <div>
+          <label class="block font-semibold mb-1 text-slate-700">Akun Lawan (Beban / Modal / Prive)</label>
+          <select id="cash-counter-account-id" required class="w-full p-2.5 border rounded-xl bg-slate-50"></select>
+        </div>
+        <div>
+          <label class="block font-semibold mb-1 text-slate-700">Jumlah Nominal (Rp)</label>
+          <input type="number" id="cash-amount" min="100" required class="w-full p-2.5 border rounded-xl bg-slate-50" placeholder="Nominal rupiah">
+        </div>
+        <div>
+          <label class="block font-semibold mb-1 text-slate-700">Deskripsi / Memo</label>
+          <input type="text" id="cash-desc" class="w-full p-2.5 border rounded-xl bg-slate-50" placeholder="Contoh: Ongkos bensin antar keset ke ekspedisi">
+        </div>
+        <div class="flex justify-end gap-2 pt-2 border-t">
+          <button type="button" onclick="closeModal('modal-new-cash-trx')" class="px-4 py-2 border rounded-xl text-slate-600 hover:bg-slate-100">Batal</button>
+          <button type="submit" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold">Simpan Transaksi</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 10: Tambah Barang / Bahan Baru -->
+  <div id="modal-new-item" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b pb-3">
+        <h3 class="font-bold text-slate-800 text-base">Tambah Barang / Bahan Baru</h3>
+        <button onclick="closeModal('modal-new-item')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <form id="form-new-item" onsubmit="submitNewItem(event)" class="space-y-4 text-xs">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold mb-1 text-slate-700">Kode SKU</label>
+            <input type="text" id="item-sku" required class="w-full p-2.5 border rounded-xl bg-slate-50" placeholder="KST-4060">
+          </div>
+          <div>
+            <label class="block font-semibold mb-1 text-slate-700">Tipe</label>
+            <select id="item-type" required class="w-full p-2.5 border rounded-xl bg-slate-50">
+              <option value="FINISHED_GOOD">Barang Jadi (Keset)</option>
+              <option value="RAW_MATERIAL">Bahan Baku (Perca, Benang, dll.)</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="block font-semibold mb-1 text-slate-700">Nama Barang</label>
+          <input type="text" id="item-name" required class="w-full p-2.5 border rounded-xl bg-slate-50" placeholder="Keset Kaki Microfiber...">
+        </div>
+        <div class="grid grid-cols-3 gap-3">
+          <div>
+            <label class="block font-semibold mb-1 text-slate-700">Satuan</label>
+            <select id="item-unit-id" required class="w-full p-2.5 border rounded-xl bg-slate-50"></select>
+          </div>
+          <div>
+            <label class="block font-semibold mb-1 text-slate-700">Ukuran</label>
+            <input type="text" id="item-size" class="w-full p-2.5 border rounded-xl bg-slate-50" placeholder="40x60 cm">
+          </div>
+          <div>
+            <label class="block font-semibold mb-1 text-slate-700">Stok Min</label>
+            <input type="number" id="item-min-stock" value="0" class="w-full p-2.5 border rounded-xl bg-slate-50">
+          </div>
+        </div>
+        <div class="flex justify-end gap-2 pt-2 border-t">
+          <button type="button" onclick="closeModal('modal-new-item')" class="px-4 py-2 border rounded-xl text-slate-600 hover:bg-slate-100">Batal</button>
+          <button type="submit" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold">Simpan Barang</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 11: Tambah Mitra Baru -->
+  <div id="modal-new-partner" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b pb-3">
+        <h3 class="font-bold text-slate-800 text-base">Tambah Mitra Usaha</h3>
+        <button onclick="closeModal('modal-new-partner')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <form id="form-new-partner" onsubmit="submitNewPartner(event)" class="space-y-4 text-xs">
+        <div>
+          <label class="block font-semibold mb-1 text-slate-700">Nama Perusahaan / Toko / Perorangan</label>
+          <input type="text" id="partner-name" required class="w-full p-2.5 border rounded-xl bg-slate-50" placeholder="Toko Keset Indah">
+        </div>
+        <div>
+          <label class="block font-semibold mb-1 text-slate-700">No Telepon / WhatsApp</label>
+          <input type="text" id="partner-phone" class="w-full p-2.5 border rounded-xl bg-slate-50" placeholder="08...">
+        </div>
+        <div>
+          <label class="block font-semibold mb-1 text-slate-700">Alamat</label>
+          <input type="text" id="partner-address" class="w-full p-2.5 border rounded-xl bg-slate-50">
+        </div>
+        <div class="flex gap-4 pt-1">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" id="partner-is-customer" checked class="rounded text-indigo-600">
+            <span>Pelanggan (Customer)</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" id="partner-is-supplier" class="rounded text-indigo-600">
+            <span>Pemasok (Supplier)</span>
+          </label>
+        </div>
+        <div class="flex justify-end gap-2 pt-2 border-t">
+          <button type="button" onclick="closeModal('modal-new-partner')" class="px-4 py-2 border rounded-xl text-slate-600 hover:bg-slate-100">Batal</button>
+          <button type="submit" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold">Simpan Mitra</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 12: Tambah Pekerja Baru -->
+  <div id="modal-new-worker" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b pb-3">
+        <h3 class="font-bold text-slate-800 text-base">Tambah Pekerja Borongan</h3>
+        <button onclick="closeModal('modal-new-worker')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <form id="form-new-worker" onsubmit="submitNewWorker(event)" class="space-y-4 text-xs">
+        <div>
+          <label class="block font-semibold mb-1 text-slate-700">Nama Pekerja</label>
+          <input type="text" id="worker-name" required class="w-full p-2.5 border rounded-xl bg-slate-50" placeholder="Pak Slamet">
+        </div>
+        <div>
+          <label class="block font-semibold mb-1 text-slate-700">No Telepon</label>
+          <input type="text" id="worker-phone" class="w-full p-2.5 border rounded-xl bg-slate-50" placeholder="08...">
+        </div>
+        <div>
+          <label class="block font-semibold mb-1 text-slate-700">Alamat Rumah</label>
+          <input type="text" id="worker-address" class="w-full p-2.5 border rounded-xl bg-slate-50">
+        </div>
+        <div class="flex justify-end gap-2 pt-2 border-t">
+          <button type="button" onclick="closeModal('modal-new-worker')" class="px-4 py-2 border rounded-xl text-slate-600 hover:bg-slate-100">Batal</button>
+          <button type="submit" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold">Simpan Pekerja</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 13: Kompensasi / Netting Mitra (C1) -->
+  <div id="modal-netting" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b pb-3">
+        <div>
+          <h3 class="font-bold text-slate-800 text-base">Kompensasi (Netting) Mitra (C1)</h3>
+          <p class="text-xs text-indigo-600 font-medium">Pelunasan silang antara Piutang Penjualan dan Utang Pembelian</p>
+        </div>
+        <button onclick="closeModal('modal-netting')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <form id="form-netting" onsubmit="submitNetting(event)" class="space-y-4 text-xs">
+        <div>
+          <label class="block font-semibold mb-1 text-slate-700">Pilih Mitra (Pemasok & Pelanggan)</label>
+          <select id="netting-partner-id" onchange="onNettingPartnerChange(this.value)" required class="w-full p-2.5 border rounded-xl bg-slate-50"></select>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold mb-1 text-slate-700">Pilih Faktur Penjualan (Piutang)</label>
+            <select id="netting-sale-id" required class="w-full p-2.5 border rounded-xl bg-slate-50"></select>
+          </div>
+          <div>
+            <label class="block font-semibold mb-1 text-slate-700">Pilih Faktur Pembelian (Utang)</label>
+            <select id="netting-purchase-id" required class="w-full p-2.5 border rounded-xl bg-slate-50"></select>
+          </div>
+        </div>
+        <div>
+          <label class="block font-semibold mb-1 text-slate-700">Nominal yang Dikompensasikan (Rp)</label>
+          <input type="number" id="netting-amount" min="100" required class="w-full p-2.5 border rounded-xl bg-slate-50" placeholder="Nominal kompensasi">
+        </div>
+        <div class="bg-indigo-50 border border-indigo-200 p-3 rounded-xl text-indigo-900 text-xs">
+          <i class="fa-solid fa-circle-info mr-1"></i> Tidak ada uang fisik yang keluar atau masuk. Sistem langsung membuat Auto-Jurnal <b>Dr 2-1100 Utang Usaha; Cr 1-1300 Piutang Usaha</b> (C1).
+        </div>
+        <div class="flex justify-end gap-2 pt-2 border-t">
+          <button type="button" onclick="closeModal('modal-netting')" class="px-4 py-2 border rounded-xl text-slate-600 hover:bg-slate-100">Batal</button>
+          <button type="submit" class="px-5 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl font-semibold">Proses Netting</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 14: Tambah Resep Standar BOM Baru -->
+  <div id="modal-new-bom" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-xl w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b pb-3">
+        <h3 class="font-bold text-slate-800 text-base">Buat Resep Standar (BOM) Baru</h3>
+        <button onclick="closeModal('modal-new-bom')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <form id="form-new-bom" onsubmit="submitNewBom(event)" class="space-y-4 text-xs">
+        <div>
+          <label class="block font-semibold mb-1 text-slate-700">Pilih Produk Keset (Barang Jadi)</label>
+          <select id="bom-finished-item-id" required class="w-full p-2.5 border rounded-xl bg-slate-50"></select>
+        </div>
+        <div class="border rounded-xl p-3 bg-slate-50 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-slate-700">Kebutuhan Bahan Baku Per 1 Unit Keset</span>
+            <button type="button" onclick="addBomLine()" class="px-2.5 py-1 bg-indigo-50 text-indigo-700 font-semibold rounded-lg hover:bg-indigo-100">+ Tambah Bahan</button>
+          </div>
+          <div id="bom-lines-container" class="space-y-2"></div>
+        </div>
+        <div class="flex justify-end gap-2 pt-2 border-t">
+          <button type="button" onclick="closeModal('modal-new-bom')" class="px-4 py-2 border rounded-xl text-slate-600 hover:bg-slate-100">Batal</button>
+          <button type="submit" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold">Simpan Resep BOM</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 15: Penyesuaian Stok Opname (F4/F5) -->
+  <div id="modal-stock-opname" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b pb-3">
+        <div>
+          <h3 class="font-bold text-slate-800 text-base">Penyesuaian Stok Opname (F4/F5)</h3>
+          <p class="text-xs text-slate-500">Sesuaikan selisih fisik vs sistem dengan auto-jurnal akun 5-5000</p>
+        </div>
+        <button onclick="closeModal('modal-stock-opname')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <form id="form-stock-opname" onsubmit="submitStockOpname(event)" class="space-y-4 text-xs">
+        <div>
+          <label class="block font-semibold mb-1 text-slate-700">Pilih Barang / Bahan</label>
+          <select id="opname-item-id" required class="w-full p-2.5 border rounded-xl bg-slate-50"></select>
+        </div>
+        <div>
+          <label class="block font-semibold mb-1 text-slate-700">Lokasi Penyimpanan</label>
+          <select id="opname-location" onchange="toggleOpnameWorker(this.value)" required class="w-full p-2.5 border rounded-xl bg-slate-50">
+            <option value="RAW_WH">Gudang Bahan Baku (RAW_WH)</option>
+            <option value="FG_WH">Gudang Barang Jadi (FG_WH)</option>
+            <option value="WORKER">Di Tangan Pekerja / WIP (WORKER)</option>
+          </select>
+        </div>
+        <div id="opname-worker-wrapper" class="hidden">
+          <label class="block font-semibold mb-1 text-slate-700">Pekerja Pemegang Bahan</label>
+          <select id="opname-worker-id" class="w-full p-2.5 border rounded-xl bg-slate-50"></select>
+        </div>
+        <div>
+          <label class="block font-semibold mb-1 text-slate-700">Hasil Hitung Fisik Sebenarnya (Counted Qty)</label>
+          <input type="number" id="opname-counted-qty" min="0" step="0.01" required class="w-full p-2.5 border rounded-xl bg-slate-50 font-bold" placeholder="Kuantitas fisik riil">
+        </div>
+        <div>
+          <label class="block font-semibold mb-1 text-slate-700">Alasan / Catatan Penyesuaian</label>
+          <input type="text" id="opname-note" class="w-full p-2.5 border rounded-xl bg-slate-50" placeholder="Contoh: Hasil opname fisik akhir bulan">
+        </div>
+        <div class="flex justify-end gap-2 pt-2 border-t">
+          <button type="button" onclick="closeModal('modal-stock-opname')" class="px-4 py-2 border rounded-xl text-slate-600 hover:bg-slate-100">Batal</button>
+          <button type="submit" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-semibold">Simpan Opname</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 16: Cetak Nota / Faktur Penjualan -->
+  <div id="modal-print-invoice" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b pb-3">
+        <h3 class="font-bold text-slate-800 text-base">Pratinjau Nota Penjualan</h3>
+        <button onclick="closeModal('modal-print-invoice')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <div id="print-invoice-content" class="border p-5 rounded-xl bg-white space-y-4 text-xs font-mono">
+        <!-- Dynamic invoice content -->
+      </div>
+      <div class="flex justify-end gap-2 pt-2 border-t">
+        <button type="button" onclick="closeModal('modal-print-invoice')" class="px-4 py-2 border rounded-xl text-slate-600 hover:bg-slate-100 text-xs">Tutup</button>
+        <button type="button" onclick="window.print()" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold text-xs flex items-center gap-1.5">
+          <i class="fa-solid fa-print"></i> Cetak Dokumen
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Script JS Aplikasi -->
+  <script src="/app.js"></script>
+</body>
+</html>
+
